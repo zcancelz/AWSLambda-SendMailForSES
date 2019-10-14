@@ -9,7 +9,7 @@ node version : 8.10.0
 2. Create a template in AWS SES.(naming : {type}_{lang})
 3. Add query or dailyMailType  to query.js, mailTypeList.js
 - mailTypeList.js : Added the type name used when creating ses template.
-- query.js : Create a query with the type name used when creating the ses template. Select the list to be replaced in the template by query.
+- query.js : Create a query with the type name used when creating the ses template. Select the list to be replaced in the template by query.  
 ![architecture](./architecture.png)
 
 ### 호출 규격
