@@ -1,0 +1,16 @@
+{
+  "name": "mailsender",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "daily": "node -e \"console.log(require('./index').handler({mode:'daily_check'}));\"",
+    "test": "node -e \"console.log(require('./index').handler({mode:'test'}));\""
+  },
+  "dependencies": {
+    "crypto": "^1.0.1",
+    "mysql2": "^1.7.0"
+  },
+  "devDependencies": {
+    "aws-sdk": "^2.540.0"
+  }
+}
