@@ -12,12 +12,12 @@ exports.handler = async (event) => {
     try{
         // console.log(mailTypeList[0]);
         if('daily_check' === event.mode){
-            let mailsendPromises =  mailTypeList.map(async (key)=>{
-                return await checkSendMailList(con, key);
+            let mailSendPromises =  mailTypeList.map(async (mail)=>{
+                return await checkSendMailList(con, mail.mode, mail.variable);
             });
-            await Promise.all(mailsendPromises);
+            await Promise.all(mailSendPromises);
         }else{
-            await checkSendMailList(con, event.mode);
+            await checkSendMailList(con, event.mode, event.variable);
         }
         response = createResponseData('0000');
 
@@ -25,29 +25,37 @@ exports.handler = async (event) => {
         console.log(e.message);
         response = await createResponseData('9999');
     }
+
     return await response;
 };
 
-async function checkSendMailList(con, mode=''){
+async function checkSendMailList(con, mode='', variable=[]){
     let log = { mode: mode };
     let connection;
     let templateDataList;
     try{
         connection = await con.getConnection(async conn=>conn);
-        [templateDataList] = await connection.query(q[mode]);
+        if(variable.size===0){
+            [templateDataList] = await connection.query(q[mode])
+        }else{
+            console.log(mode, variable);
+            console.log(q[mode]);
+            [templateDataList] = await connection.query(q[mode], variable);
+        }
         connection.release();
     }catch (e) {
+        console.log(e);
         log.message = e.message;
         throw log;
     }
-
+    console.log(templateDataList);
     //send ses
     /**ses format
      // {
         //     Destination:{
         //         ToAddresses:['']
         //     },
-        //     Source: 'senderEmail',
+        //     Source: 'noreply@inka.co.kr',
         //     Template: '',
         //     TemplateData: '{}'
         // }
@@ -71,8 +79,8 @@ function createTemplateData(templateData, templateName, mode) {
         TemplateData: ''
     };
     templateRequest.Destination.ToAddresses.push(templateData.userEmail);
-    templateRequest.TemplateData = JSON.stringify(templateData);
 
+    templateRequest.TemplateData = JSON.stringify(templateData);
     return templateRequest;
 }
 
@@ -82,8 +90,7 @@ async function sendTemplateMail(mailRequest, log) {
         mailResponse = await ses.sendTemplatedEmail(mailRequest).promise();
         log.mailResponse = mailResponse;
     }catch(e){
-        log.message= e.message;
-        await console.log(log);
+        log.message= await e.message;
     }
     console.log(log);
 }

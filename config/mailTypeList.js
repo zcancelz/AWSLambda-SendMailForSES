@@ -1,4 +1,4 @@
 module.exports  = [
-  "test",
-  "test2"
+	{ mode: "test", variable: "1"},
+	{ mode: "test2"}
 ];

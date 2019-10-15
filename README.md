@@ -15,11 +15,13 @@ node version : 8.10.0
 ### 호출 규격
 ```json
 {
-    "mode": "{{mode}}"
+    "mode": "{{mode}}",
+    "variable": ["column1", "column2"]
 }
 ```
 mode : The type name used when creating the SES mail.
  - Calling 'dailly_check' with the mode value executes all items in the mailTypeList.js list.
+variable: query variables.
 
 ## NPM run Scripts
 - daily : Send all daily check items
