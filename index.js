@@ -50,16 +50,6 @@ async function checkSendMailList(con, mode='', variable=[]){
     }
     console.log(templateDataList);
     //send ses
-    /**ses format
-     // {
-        //     Destination:{
-        //         ToAddresses:['']
-        //     },
-        //     Source: 'noreply@inka.co.kr',
-        //     Template: '',
-        //     TemplateData: '{}'
-        // }
-     */
     let promises = templateDataList.map(templateData=>{
         const mailRequest = createTemplateData( templateData, mode + '_' + templateData.lang, mode);
         log.mailRequest = mailRequest;
