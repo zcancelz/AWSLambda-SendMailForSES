@@ -3,8 +3,7 @@ module.exports  = {
 			  ", USER_NAME AS userName" +
 			  ", USER_EMAIL AS userEmail" +
   			  ", LANGUAGE AS lang" +
-			  "    FROM USER_INFO", +
-			  "    WHERE SEQ=?", +
+			  "    FROM USER_INFO",
   test2: "SELECT NAME AS F.foodName" +
 			  ", PRICE AS F>foodPrice" +
 			  ", USER_EMAIL AS I.userEmail" +

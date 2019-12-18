@@ -11,13 +11,13 @@ exports.handler = async (event) => {
     let response = '';
     try{
         // console.log(mailTypeList[0]);
-        if('daily_check' === event.mode){
+		if('daily_check' === event.mode){
             let mailSendPromises =  mailTypeList.map(async (mail)=>{
                 return await checkSendMailList(con, mail.mode, mail.variable);
             });
             await Promise.all(mailSendPromises);
         }else{
-            await checkSendMailList(con, event.mode, event.variable);
+            await checkSendMailList(con, event.mode, event.variable, event.query);
         }
         response = createResponseData('0000');
 
@@ -25,41 +25,35 @@ exports.handler = async (event) => {
         console.log(e.message);
         response = await createResponseData('9999');
     }
-
     return await response;
 };
 
-async function checkSendMailList(con, mode='', variable=[]){
+async function checkSendMailList(con, mode='', variable=[], query=true){
     let log = { mode: mode };
     let connection;
     let templateDataList;
-    try{
-        connection = await con.getConnection(async conn=>conn);
-        if(variable.size===0){
-            [templateDataList] = await connection.query(q[mode])
-        }else{
-            console.log(mode, variable);
-            console.log(q[mode]);
-            [templateDataList] = await connection.query(q[mode], variable);
+if(query){
+        try{
+            connection = await con.getConnection(async conn=>conn);
+            if(variable.size===0){
+                [templateDataList] = await connection.query(q[mode])
+            }else{
+                console.log(mode, variable);
+                console.log(q[mode]);
+                [templateDataList] = await connection.query(q[mode], variable);
+            }
+            connection.release();
+        }catch (e) {
+            console.log(e);
+            log.message = e.message;
+            throw log;
         }
-        connection.release();
-    }catch (e) {
-        console.log(e);
-        log.message = e.message;
-        throw log;
+    }else{
+        templateDataList = variable;
     }
-    console.log(templateDataList);
+	console.log(templateDataList);
+
     //send ses
-    /**ses format
-     // {
-        //     Destination:{
-        //         ToAddresses:['']
-        //     },
-        //     Source: 'noreply@inka.co.kr',
-        //     Template: '',
-        //     TemplateData: '{}'
-        // }
-     */
     let promises = templateDataList.map(templateData=>{
         const mailRequest = createTemplateData( templateData, mode + '_' + templateData.lang, mode);
         log.mailRequest = mailRequest;
@@ -79,8 +73,8 @@ function createTemplateData(templateData, templateName, mode) {
         TemplateData: ''
     };
     templateRequest.Destination.ToAddresses.push(templateData.userEmail);
-
     templateRequest.TemplateData = JSON.stringify(templateData);
+
     return templateRequest;
 }
 
@@ -90,7 +84,8 @@ async function sendTemplateMail(mailRequest, log) {
         mailResponse = await ses.sendTemplatedEmail(mailRequest).promise();
         log.mailResponse = mailResponse;
     }catch(e){
-        log.message= await e.message;
+        log.message= e.message;
+        await console.log(log);
     }
     console.log(log);
 }
