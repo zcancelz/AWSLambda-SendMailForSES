@@ -11,6 +11,6 @@
     "mysql2": "^1.7.0"
   },
   "devDependencies": {
-    "aws-sdk": "^2.540.0"
+    "aws-sdk": "^2.814.0"
   }
 }
